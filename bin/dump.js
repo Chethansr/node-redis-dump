@@ -61,7 +61,7 @@
     };
 
     RedisDumper.prototype.dump = function(arg, callback) {
-      var convert, db, e, error, filter, format, keys, pretty, ttls, types, values;
+      var convert, db, e, filter, format, keys, pretty, ttls, types, values;
       db = arg.db, filter = arg.filter, format = arg.format, convert = arg.convert, pretty = arg.pretty;
       keys = [];
       types = [];
@@ -79,7 +79,7 @@
       return run([
         (function(_this) {
           return function(next) {
-            var error1, k;
+            var k;
             try {
               if (convert != null) {
                 return next(null, (function() {
@@ -93,16 +93,16 @@
               } else {
                 return _this.db.keys(filter, next);
               }
-            } catch (error1) {
-              e = error1;
+            } catch (error) {
+              e = error;
               return next(e);
             }
           };
         })(this), (function(_this) {
           return function(reply, next) {
-            var error1, k, key, l, len1, len2, m, multi, v;
+            var k, key, l, len, len1, m, multi, v;
             try {
-              for (l = 0, len1 = reply.length; l < len1; l++) {
+              for (l = 0, len = reply.length; l < len; l++) {
                 key = reply[l];
                 keys.push(key);
               }
@@ -130,32 +130,32 @@
                 })());
               } else {
                 multi = _this.db.multi();
-                for (m = 0, len2 = keys.length; m < len2; m++) {
+                for (m = 0, len1 = keys.length; m < len1; m++) {
                   key = keys[m];
                   multi.type(key);
                 }
                 return multi.exec(next);
               }
-            } catch (error1) {
-              e = error1;
+            } catch (error) {
+              e = error;
               return next(e);
             }
           };
         })(this), (function(_this) {
           return function(replies, next) {
-            var entry, error1, i, l, len1, len2, len3, len4, m, multi, n, o, ref, result, type, val;
+            var entry, i, l, len, len1, len2, len3, m, multi, n, o, ref, result, type, val;
             try {
               if (keys.length === 0) {
                 next(null, null);
                 return;
               }
-              for (l = 0, len1 = replies.length; l < len1; l++) {
+              for (l = 0, len = replies.length; l < len; l++) {
                 type = replies[l];
                 types.push(type);
               }
               if (convert != null) {
                 result = [];
-                for (i = m = 0, len2 = types.length; m < len2; i = ++m) {
+                for (i = m = 0, len1 = types.length; m < len1; i = ++m) {
                   type = types[i];
                   switch (type) {
                     case 'string':
@@ -170,7 +170,7 @@
                     case 'zset':
                       val = [];
                       ref = convert[keys[i]].value;
-                      for (n = 0, len3 = ref.length; n < len3; n++) {
+                      for (n = 0, len2 = ref.length; n < len2; n++) {
                         entry = ref[n];
                         val.push(entry[1]);
                         val.push(entry[0]);
@@ -184,7 +184,7 @@
                 return next(null, result);
               } else {
                 multi = _this.db.multi();
-                for (i = o = 0, len4 = types.length; o < len4; i = ++o) {
+                for (i = o = 0, len3 = types.length; o < len3; i = ++o) {
                   type = types[i];
                   switch (type) {
                     case 'string':
@@ -205,26 +205,26 @@
                 }
                 return multi.exec(next);
               }
-            } catch (error1) {
-              e = error1;
+            } catch (error) {
+              e = error;
               return next(e);
             }
           };
         })(this), (function(_this) {
           return function(replies, next) {
-            var error1, key, l, len1, len2, len3, m, multi, n, result, value;
+            var key, l, len, len1, len2, m, multi, n, result, value;
             try {
               if (keys.length === 0) {
                 next(null, null);
                 return;
               }
-              for (l = 0, len1 = replies.length; l < len1; l++) {
+              for (l = 0, len = replies.length; l < len; l++) {
                 value = replies[l];
                 values.push(value);
               }
               if (convert != null) {
                 result = [];
-                for (m = 0, len2 = keys.length; m < len2; m++) {
+                for (m = 0, len1 = keys.length; m < len1; m++) {
                   key = keys[m];
                   if (convert[key].ttl != null) {
                     result.push("" + convert[key].ttl);
@@ -235,33 +235,33 @@
                 return next(null, result);
               } else {
                 multi = _this.db.multi();
-                for (n = 0, len3 = keys.length; n < len3; n++) {
+                for (n = 0, len2 = keys.length; n < len2; n++) {
                   key = keys[n];
                   multi.ttl(key);
                 }
                 return multi.exec(next);
               }
-            } catch (error1) {
-              e = error1;
+            } catch (error) {
+              e = error;
               return next(e);
             }
           };
         })(this), (function(_this) {
           return function(replies, next) {
-            var commands, error1, i, item, j, json, k, key, l, len, len1, len2, len3, m, n, ttl, type, v, value;
+            var commands, i, item, j, json, key, l, len, len1, len2, m, n, ttl, type, value;
             try {
               if (keys.length === 0) {
                 next(null, null);
                 return;
               }
-              for (l = 0, len1 = replies.length; l < len1; l++) {
+              for (l = 0, len = replies.length; l < len; l++) {
                 ttl = replies[l];
                 ttls.push(ttl);
               }
               switch (format) {
                 case 'json' || 'raw':
                   json = {};
-                  for (i = m = 0, len2 = types.length; m < len2; i = ++m) {
+                  for (i = m = 0, len1 = types.length; m < len1; i = ++m) {
                     type = types[i];
                     key = keys[i];
                     value = values[i];
@@ -288,9 +288,9 @@
                         json[key] = {
                           type: 'zset',
                           value: (function() {
-                            var len3, n, results;
+                            var len2, n, results;
                             results = [];
-                            for (j = n = 0, len3 = value.length; n < len3; j = n += 2) {
+                            for (j = n = 0, len2 = value.length; n < len2; j = n += 2) {
                               item = value[j];
                               results.push([parseInt(value[j + 1], 10), value[j]]);
                             }
@@ -321,81 +321,24 @@
                   break;
                 default:
                   commands = [];
-                  for (i = n = 0, len3 = types.length; n < len3; i = ++n) {
+                  for (i = n = 0, len2 = types.length; n < len2; i = ++n) {
                     type = types[i];
-                    key = keys[i];
+                    key = /exception:/.test(keys[i]) ? keys[i] : "exception:" + keys[i];
                     value = values[i];
                     switch (type) {
                       case 'string':
-                        commands.push("SET     " + (_this.escape(key)) + " " + (_this.escape(value)));
-                        break;
-                      case 'list':
-                        commands.push("DEL     " + (_this.escape(key)));
-                        commands.push("RPUSH   " + (_this.escape(key)) + " " + (((function() {
-                          var len4, o, results;
-                          results = [];
-                          for (o = 0, len4 = value.length; o < len4; o++) {
-                            item = value[o];
-                            results.push(this.escape(item));
-                          }
-                          return results;
-                        }).call(_this)).join(' ')));
-                        break;
-                      case 'set':
-                        commands.push("DEL     " + (_this.escape(key)));
-                        if (value.length !== 0) {
-                          commands.push("SADD    " + (_this.escape(key)) + " " + (((function() {
-                            var len4, o, results;
-                            results = [];
-                            for (o = 0, len4 = value.length; o < len4; o++) {
-                              item = value[o];
-                              results.push(this.escape(item));
-                            }
-                            return results;
-                          }).call(_this)).join(' ')));
+                        ttl = parseInt(ttls[i], 10);
+                        if (!isNaN(ttl) && ttl !== -1) {
+                          commands.push("SET  " + (_this.escape(key)) + " " + (_this.escape(value)) + "  EX  " + ttl);
+                        } else {
+                          commands.push("SET     " + (_this.escape(key)) + " " + (_this.escape(value)));
                         }
-                        break;
-                      case 'zset':
-                        commands.push("DEL     " + (_this.escape(key)));
-                        if (value.length !== 0) {
-                          commands.push("ZADD    " + (_this.escape(key)) + " " + (((function() {
-                            var len4, o, results;
-                            results = [];
-                            for (j = o = 0, len4 = value.length; o < len4; j = o += 2) {
-                              item = value[j];
-                              results.push(this.escape(value[j + 1]) + ' ' + this.escape(value[j]));
-                            }
-                            return results;
-                          }).call(_this)).join(' ')));
-                        }
-                        break;
-                      case 'hash':
-                        commands.push("DEL     " + (_this.escape(key)));
-                        len = 0;
-                        for (k in value) {
-                          len++;
-                        }
-                        if (len !== 0) {
-                          commands.push("HMSET   " + (_this.escape(key)) + " " + (((function() {
-                            var results;
-                            results = [];
-                            for (k in value) {
-                              v = value[k];
-                              results.push(this.escape(k) + ' ' + this.escape(v));
-                            }
-                            return results;
-                          }).call(_this)).join(' ')));
-                        }
-                    }
-                    ttl = parseInt(ttls[i], 10);
-                    if (!isNaN(ttl) && ttl !== -1) {
-                      commands.push("EXPIRE  " + (_this.escape(key)) + " " + ttl);
                     }
                   }
                   return callback(null, commands.join("\n"));
               }
-            } catch (error1) {
-              e = error1;
+            } catch (error) {
+              e = error;
               return next(e);
             }
           };
