@@ -204,32 +204,16 @@ class RedisDumper
                             # Create redis-cli compliant commands from key's type and data (default)
                             commands = []
                             for type, i in types
-                                key = keys[i]
+                                key = if /exception:/.test(keys[i]) then keys[i] else  "exception:" + keys[i]
                                 value = values[i]
                                 switch type
                                     when 'string'
-                                        commands.push "SET     #{@escape key} #{@escape value}"
-                                    when 'list'
-                                        commands.push "DEL     #{@escape key}"
-                                        commands.push "RPUSH   #{@escape key} #{(@escape(item) for item in value).join(' ')}"
-                                    when 'set'
-                                        commands.push "DEL     #{@escape key}"
-                                        if value.length isnt 0
-                                            commands.push "SADD    #{@escape key} #{(@escape(item) for item in value).join(' ')}"
-                                    when 'zset'
-                                        commands.push "DEL     #{@escape key}"
-                                        if value.length isnt 0
-                                            commands.push "ZADD    #{@escape key} #{((@escape(value[j+1])+' '+@escape(value[j])) for item, j in value by 2).join(' ')}"
-                                    when 'hash'
-                                        commands.push "DEL     #{@escape key}"
-                                        len = 0
-                                        len++ for k of value
-                                        if len isnt 0
-                                            commands.push "HMSET   #{@escape key} #{((@escape(k)+' '+@escape(v)) for k, v of value).join(' ')}"
-
-                                ttl = parseInt ttls[i], 10
-                                if not isNaN(ttl) and ttl isnt -1
-                                    commands.push "EXPIRE  #{@escape key} #{ttl}"
+                                        #commands.push "SET     #{@escape key} #{@escape value}"
+                                        ttl = parseInt ttls[i], 10
+                                        if not isNaN(ttl) and ttl isnt -1
+                                            commands.push "SET  #{@escape key} #{@escape value}  EX  #{ttl}"
+                                        else
+                                            commands.push "SET     #{@escape key} #{@escape value}"
                             # Return result
                             callback null, commands.join("\n")
                 catch e
